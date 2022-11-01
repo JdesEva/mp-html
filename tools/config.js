@@ -1,3 +1,5 @@
+const { style } = require('../style/extern-style')
+
 /**
  * @fileoverview 配置文件
  */
@@ -14,7 +16,7 @@ module.exports = {
     // 'markdown',  // 解析 md
     // 'latex',     // 解析 latex
     // 'search',    // 关键词搜索
-    // 'style',     // 解析 style 标签
+    'style',     // 解析 style 标签
     // 'txv-video', // 使用腾讯视频
     // 'img-cache'  // 图片缓存
   ],
@@ -23,7 +25,7 @@ module.exports = {
    * @description 要引入到组件中的外部样式（css）
    * 仅支持标签名和 class 选择器
    */
-  externStyle: '',
+  externStyle: style,
 
   /**
    * @description 要引入到模板中的自定义标签（ad 等）

@@ -345,7 +345,28 @@ Component({
         const callback = rect => {
           // 350ms 总高度无变化就触发 ready 事件
           if (rect.height === height) {
-            this.triggerEvent('ready', rect)
+            // 添加自定义逻辑 -- 监听每一个锚点id的回调 方便做锚点联动
+            if(this.data.useAnchor) {
+              const anchorHeight = [] //锚点高度列表
+              const anchorIds = this.getAnchorIds()
+
+              anchorIds.forEach((anchorId, index) => {
+                anchorId = anchorId.replace(/[\"\']/, '')
+                this.createSelectorQuery().select(`._root >>> #${anchorId}`).boundingClientRect().selectViewport().scrollOffset().exec(res => {
+  
+                  if(res[0]) {
+                    anchorHeight.push({ id: anchorId, height: res[1].scrollTop + res[0].top })
+                  }
+  
+                  if (index === anchorIds.length - 1) {
+                    this.triggerEvent('ready', { ...rect, anchorHeight })
+                    clearInterval(this._timer)
+                  }
+                })
+              })
+            } else {
+              this.triggerEvent('ready', rect)
+            }
           } else {
             height = rect.height
             setTimeout(() => {
@@ -363,7 +384,14 @@ Component({
         }
       }
     },
+    /**
+     * @description 获取富文本内容的所有锚点
+     */
+     getAnchorIds () {
+      const regx = /[\s]searchId=[\"\'][\w_-]+[\"\']/gmi
 
+      return this.data.content.match(regx).map(p => p.trim().replace(/searchId=[\"\']/, "parseId"))
+    },
     /**
      * @description 调用插件的钩子函数
      * @private
